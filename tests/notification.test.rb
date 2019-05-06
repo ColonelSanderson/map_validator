@@ -1,10 +1,13 @@
 require 'test/unit'
-require_relative '../src/ValidatorFunctions'
+require_relative '../lib/map_validator/validator_functions'
+require_relative '../lib/map_validator/notifications'
 
 class TestNotifications < Test::Unit::TestCase
 
+  include MapValidator::ValidatorFunctions
+
   def setup
-    @notifications = Notifications.new
+    @notifications = MapValidator::Notifications.new
     @meta = {}
   end
 

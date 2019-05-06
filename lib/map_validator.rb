@@ -1,9 +1,13 @@
-require_relative 'notifications'
-require_relative 'validator_functions'
-require_relative 'vocabularies'
 require 'csv'
 
+require_relative 'map_validator/notifications'
+require_relative 'map_validator/validator_functions'
+require_relative 'map_validator/vocabularies'
+
+
 class MapValidator
+  include MapValidator::ValidatorFunctions
+
   attr_reader :notifications
   def initialize
     @notifications = Notifications.new
@@ -27,42 +31,45 @@ class MapValidator
       firstrun = false
     end
   end
+
+
+  def sample_validations
+    {
+      'Disposal Class': Proc.new(&method("is_not_empty")),
+      'Title': Proc.new(&method("is_not_empty")),
+        # Description: ,
+        # "Agency Control number":,
+      'Sequence Number': Proc.new(&method("is_not_empty")),
+      # 'Attachment Related to Sequence Number':
+      # 'Attachment Notes':
+      'Access Category': proc {|notifications, meta, col| is_in_vocab(notifications, meta.merge(vocabulary: getVocabularies[:accessCategories]), col)},
+      'Publish Metadata?': proc do |notifications, meta, col|
+        is_not_empty(notifications, meta, col) &&
+          is_boolean(notifications, meta.merge(true_value: 'Yes', false_value: 'No'), col)
+      end,
+      'Start Date': proc {|notifications, meta, col| is_valid_date(notifications, meta.merge(mandatory: true), col)},
+      'Start Date Qualifier': proc do |notifications, meta, col|
+        is_in_vocab(notifications, meta.merge(vocabulary: getVocabularies[:dateQualifierVocabularies]), col)
+      end,
+      'End Date': proc {|notifications, meta, col| is_valid_date(notifications, meta.merge(mandatory: true), col)},
+      'End Date Qualifier': proc do |notifications, meta, col|
+        is_in_vocab(notifications, meta.merge(vocabulary: getVocabularies[:dateQualifierVocabularies]), col)
+      end,
+      'Format - Physical': proc {|notifications, meta, col| is_in_vocab(notifications, meta.merge(vocabulary: getVocabularies[:formatPhysical]), col)},
+      'Contained with': proc {|notifications, meta, col| is_in_vocab(notifications, meta.merge(vocabulary: getVocabularies[:containedWith]), col)},
+      'Box Number': proc do |notifications, meta, col|
+        is_not_nil(notifications, meta, col) &&
+          is_integer(notifications, meta.merge(minValue: 0), col)
+      end,
+        # Remarks
+        # "Series ID"
+        # "Responsible Agency"
+        # "Creating Agency"
+      'Sensititvity Label': proc {|notifications, meta, col| is_in_vocab(notifications, meta.merge(vocabulary: getVocabularies[:sensitivityLabels]), col)}
+    }
+  end
 end
 
-validations = {
-  'Disposal Class': Proc.new(&method("is_not_empty")),
-  'Title': Proc.new(&method("is_not_empty")),
-    # Description: ,
-    # "Agency Control number":,
-  'Sequence Number': Proc.new(&method("is_not_empty")),
-  # 'Attachment Related to Sequence Number':
-  # 'Attachment Notes':
-  'Access Category': proc {|notifications, meta, col| is_in_vocab(notifications, meta.merge(vocabulary: getVocabularies[:accessCategories]), col)},
-  'Publish Metadata?': proc do |notifications, meta, col|
-    is_not_empty(notifications, meta, col) &&
-      is_boolean(notifications, meta.merge(true_value: 'Yes', false_value: 'No'), col)
-  end,
-  'Start Date': proc {|notifications, meta, col| is_valid_date(notifications, meta.merge(mandatory: true), col)},
-  'Start Date Qualifier': proc do |notifications, meta, col|
-    is_in_vocab(notifications, meta.merge(vocabulary: getVocabularies[:dateQualifierVocabularies]), col)
-  end,
-  'End Date': proc {|notifications, meta, col| is_valid_date(notifications, meta.merge(mandatory: true), col)},
-  'End Date Qualifier': proc do |notifications, meta, col|
-    is_in_vocab(notifications, meta.merge(vocabulary: getVocabularies[:dateQualifierVocabularies]), col)
-  end,
-  'Format - Physical': proc {|notifications, meta, col| is_in_vocab(notifications, meta.merge(vocabulary: getVocabularies[:formatPhysical]), col)},
-  'Contained with': proc {|notifications, meta, col| is_in_vocab(notifications, meta.merge(vocabulary: getVocabularies[:containedWith]), col)},
-  'Box Number': proc do |notifications, meta, col|
-    is_not_nil(notifications, meta, col) &&
-      is_integer(notifications, meta.merge(minValue: 0), col)
-  end,
-    # Remarks
-    # "Series ID"
-    # "Responsible Agency"
-    # "Creating Agency"
-  'Sensititvity Label': proc {|notifications, meta, col| is_in_vocab(notifications, meta.merge(vocabulary: getVocabularies[:sensitivityLabels]), col)}
-}
-
-csv_validator = MapValidator.new
-csv_validator.run_validations("/home/seana/transferlist.csv", validations)
-csv_validator.notifications.notification_list.each {|notification| puts "[#{notification.type}](#{notification.source}): #{notification.message}" }
+# csv_validator = MapValidator.new
+# csv_validator.run_validations("/home/seana/transferlist.csv", MapValidator::SAMPLE_VALIDATIONS)
+# csv_validator.notifications.notification_list.each {|notification| puts "[#{notification.type}](#{notification.source}): #{notification.message}" }
