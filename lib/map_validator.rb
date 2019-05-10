@@ -23,7 +23,7 @@ class MapValidator
         if has_validation_rule
           validations[colName.intern].call(@notifications, field_metadata, col)
         elsif firstrun
-          @notifications.add_notification(:WARNING,
+          @notifications.add_notification(:DEBUG,
                                           "There was no validation rule found for column #{colName}.",
                                           '')
         end
@@ -32,6 +32,10 @@ class MapValidator
     end
   end
 
+
+  def enable_debug
+    @notifications.enable_debug
+  end
 
   def sample_validations
     {

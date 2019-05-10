@@ -21,4 +21,14 @@ class TestNotifications < Test::Unit::TestCase
     assert_equal(@notifications.notification_list.count, 3)
   end
 
+  def test_ignores_debug_unless_asked
+    @notifications.add_notification(:DEBUG, 'Hello, sailor!', 'C17')
+    assert_empty(@notifications.notification_list)
+
+    notifications = MapValidator::Notifications.new
+    notifications.enable_debug
+    notifications.add_notification(:DEBUG, 'Hello, sailor!', 'C17')
+    assert_equal(notifications.notification_list.count, 1)
+  end
+
 end
