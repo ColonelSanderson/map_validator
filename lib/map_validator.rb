@@ -75,6 +75,6 @@ class MapValidator
   end
 end
 
-csv_validator = MapValidator.new
-csv_validator.run_validations("/home/seana/transferlist.csv", csv_validator.sample_validations)
-csv_validator.notifications.notification_list.each {|notification| puts "[#{notification.type}](#{notification.source}): #{notification.message}" }
+# csv_validator = MapValidator.new
+# csv_validator.run_validations("/home/seana/transferlist.csv", csv_validator.sample_validations)
+# csv_validator.notifications.notification_list.each {|notification| puts "[#{notification.type}](#{notification.source}): #{notification.message}" }

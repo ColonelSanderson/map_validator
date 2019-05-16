@@ -99,7 +99,6 @@ class MapValidator
 
       solr_query = "primary_type:#{meta[:type]} AND #{meta[:id_field]}:#{value}"
       solr_url = "#{@app_config[:solr_url]}/select"
-      puts solr_url
       uri = URI(solr_url)
       uri.query = URI.encode_www_form(q: solr_query, qt: 'json')
       request = Net::HTTP::Get.new(uri)
