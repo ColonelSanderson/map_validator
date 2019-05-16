@@ -3,14 +3,15 @@ require 'csv'
 require_relative 'map_validator/notifications'
 require_relative 'map_validator/validator_functions'
 require_relative 'map_validator/vocabularies'
-
+require_relative '../config/default_config'
 
 class MapValidator
   include MapValidator::ValidatorFunctions
 
   attr_reader :notifications
-  def initialize
+  def initialize(app_config = get_app_config)
     @notifications = Notifications.new
+    @app_config = app_config
   end
 
   def run_validations(csvString, validations)
@@ -66,7 +67,7 @@ class MapValidator
           is_integer(notifications, meta.merge(minValue: 0), col)
       end,
         # Remarks
-        # "Series ID"
+      'Series ID': proc {|notifications, meta, col| row_id_exists(notifications, meta.merge(type: 'resource', id_field: 'identifier'), col)},
         # "Responsible Agency"
         # "Creating Agency"
       'Sensititvity Label': proc {|notifications, meta, col| is_in_vocab(notifications, meta.merge(vocabulary: getVocabularies[:sensitivityLabels]), col)}
@@ -74,6 +75,6 @@ class MapValidator
   end
 end
 
-# csv_validator = MapValidator.new
-# csv_validator.run_validations("/home/seana/transferlist.csv", MapValidator::SAMPLE_VALIDATIONS)
-# csv_validator.notifications.notification_list.each {|notification| puts "[#{notification.type}](#{notification.source}): #{notification.message}" }
+csv_validator = MapValidator.new
+csv_validator.run_validations("/home/seana/transferlist.csv", csv_validator.sample_validations)
+csv_validator.notifications.notification_list.each {|notification| puts "[#{notification.type}](#{notification.source}): #{notification.message}" }

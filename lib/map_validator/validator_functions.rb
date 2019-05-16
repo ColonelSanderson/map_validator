@@ -1,4 +1,6 @@
 require 'date'
+require 'net/http'
+require 'json'
 
 class MapValidator
   module ValidatorFunctions
@@ -83,6 +85,34 @@ class MapValidator
       end
       unless [true_value, false_value].include? value
         notifications.add_notification :ERROR, "Value `#{value}` was neither  `#{true_value}`, nor `#{false_value}`", formatSource(meta)
+      end
+    end
+
+    def row_id_exists(notifications, meta, value)
+      # Optional values don't need to be parsed
+      if !meta[:mandatory] && value.nil?
+        return
+      end
+      if meta[:mandatory] && value.nil?
+        notifications.add_notification :ERROR, 'ID field was marked as mandatory, but value was empty.', formatSource(meta)
+      end
+
+      solr_query = "primary_type:#{meta[:type]} AND #{meta[:id_field]}:#{value}"
+      solr_url = "#{@app_config[:solr_url]}/select"
+      puts solr_url
+      uri = URI(solr_url)
+      uri.query = URI.encode_www_form(q: solr_query, qt: 'json')
+      request = Net::HTTP::Get.new(uri)
+      Net::HTTP.start(uri.host, uri.port) do |http|
+        response = http.request(request)
+        unless response.code == '200'
+          notifications.add_notification :ERROR, "When checking the database, recieved code: #{response.code} with message: #{JSON.parse(response.body)['response']}"
+          return
+        end
+        docs = JSON.parse(response.body).fetch('response').fetch('docs').map {|hit| Hash[meta[:id_field], hit.fetch(meta[:id_field])]}
+        if docs.empty? || docs[0][meta[:id_field]] != value
+          notifications.add_notification :ERROR, "No match found for field `#{meta[:id_field]}`: #{value}"
+        end
       end
     end
   end

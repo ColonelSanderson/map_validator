@@ -13,7 +13,13 @@
     * mandatory
     * true_value
     * false_value
+* row_id_exists
+    * mandatory
+    * type
+    * id_field
 
 `mandatory` determines whether a nil value should short-circuit the validation or not.
 `vocabulary` is the vocabulary to match the value against
 `true_value`/`false_value` are the boolean options (eg. `yes`/`no`)
+`type` refers to the the record type in Solr
+`id_field` refers to the field to match on
