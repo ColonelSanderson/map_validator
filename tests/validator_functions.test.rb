@@ -136,7 +136,7 @@ describe MapValidator do
   describe 'row_id_exists' do
     it 'adds an error when there is server error' do
       stub_request(:get, /localhost\/select\?/).to_return(row_id_response_400)
-      row_id_exists(@notifications, @meta.merge(type: 'resource', id_field: 'identifier'), '123')
+      row_id_exists(@notifications, @meta.merge(type_name: 'identifier', type: 'resource', id_field: 'identifier'), '123')
       expect(@notifications.notification_list.length).to eq(1)
       expect(@notifications.notification_list.first.type).to eq(:ERROR)
     end
@@ -144,7 +144,7 @@ describe MapValidator do
     it 'adds an error when there is a valid response, but no match is found' do
       stub_request(:get, /localhost\/select\?/)
           .to_return(row_id_response_success([]))
-      row_id_exists(@notifications, @meta.merge(type: 'resource', id_field: 'identifier'), '123')
+      row_id_exists(@notifications, @meta.merge(type_name: 'identifier', type: 'resource', id_field: 'identifier'), '123')
       expect(@notifications.notification_list.length).to eq(1)
       expect(@notifications.notification_list.first.message).to eq('No match found for field `identifier`: 123')
     end
@@ -152,7 +152,7 @@ describe MapValidator do
     it 'does not add a notification when a match is found' do
       stub_request(:get, /localhost\/select\?/)
         .to_return(row_id_response_success([Hash['primary_type', 'resource', 'identifier', '123']]))
-      row_id_exists(@notifications, @meta.merge(type: 'resource', id_field: 'identifier'), '123')
+      row_id_exists(@notifications, @meta.merge(type_name: 'identifier', type: 'resource', id_field: 'identifier'), '123')
       expect(@notifications.notification_list).to be_empty
     end
   end

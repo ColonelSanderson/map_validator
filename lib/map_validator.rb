@@ -47,7 +47,7 @@ class MapValidator
       'Sequence Number': Proc.new(&method("is_not_empty")),
       # 'Attachment Related to Sequence Number':
       # 'Attachment Notes':
-      'Access Category': proc {|notifications, meta, col| is_in_vocab(notifications, meta.merge(vocabulary: getVocabularies[:accessCategories]), col)},
+      'Restricted Access Period': proc {|notifications, meta, col| is_in_vocab(notifications, meta.merge(vocabulary: getVocabularies[:accessCategories]), col)},
       'Publish Metadata?': proc do |notifications, meta, col|
         is_not_empty(notifications, meta, col) &&
           is_boolean(notifications, meta.merge(true_value: 'Yes', false_value: 'No'), col)
@@ -60,16 +60,17 @@ class MapValidator
       'End Date Qualifier': proc do |notifications, meta, col|
         is_in_vocab(notifications, meta.merge(vocabulary: getVocabularies[:dateQualifierVocabularies]), col)
       end,
-      'Format - Physical': proc {|notifications, meta, col| is_in_vocab(notifications, meta.merge(vocabulary: getVocabularies[:formatPhysical]), col)},
+      'Representation Type': proc {|notifications, meta, col| is_in_vocab(notifications, meta.merge(vocabulary: getVocabularies[:representationType]), col)},
+      'Format': proc {|notifications, meta, col| is_in_vocab(notifications, meta.merge(vocabulary: getVocabularies[:format]), col)},
       'Contained with': proc {|notifications, meta, col| is_in_vocab(notifications, meta.merge(vocabulary: getVocabularies[:containedWith]), col)},
       'Box Number': proc do |notifications, meta, col|
         is_not_nil(notifications, meta, col) &&
           is_integer(notifications, meta.merge(minValue: 0), col)
       end,
         # Remarks
-      'Series ID': proc {|notifications, meta, col| row_id_exists(notifications, meta.merge(type: 'resource', id_field: 'identifier'), col)},
+      'Series ID': proc {|notifications, meta, col| row_id_exists(notifications, meta.merge(type_name: 'primary_type', type: 'resource', id_field: 'identifier'), col)},
         # "Responsible Agency"
-        # "Creating Agency"
+      'Creating Agency': proc {|notifications, meta, col| row_id_exists(notifications, meta.merge(type_name: 'types', type: 'agent', id_field: 'title'), col)},
       'Sensititvity Label': proc {|notifications, meta, col| is_in_vocab(notifications, meta.merge(vocabulary: getVocabularies[:sensitivityLabels]), col)}
     }
   end

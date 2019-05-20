@@ -97,7 +97,7 @@ class MapValidator
         notifications.add_notification :ERROR, 'ID field was marked as mandatory, but value was empty.', formatSource(meta)
       end
 
-      solr_query = "primary_type:#{meta[:type]} AND #{meta[:id_field]}:#{value}"
+      solr_query = "#{meta[:type_name]}:#{meta[:type]} AND #{meta[:id_field]}:\"#{value}\""
       solr_url = "#{@app_config[:solr_url]}/select"
       uri = URI(solr_url)
       uri.query = URI.encode_www_form(q: solr_query, qt: 'json')
@@ -105,7 +105,7 @@ class MapValidator
       Net::HTTP.start(uri.host, uri.port) do |http|
         response = http.request(request)
         unless response.code == '200'
-          notifications.add_notification :ERROR, "When checking the database, recieved code: #{response.code} with message: #{JSON.parse(response.body)['response']}"
+          notifications.add_notification :ERROR, "While querying (`#{solr_url}?q=#{solr_query}`), recieved code: #{response.code} with message: #{JSON.parse(response.body)['response']}"
           return
         end
         docs = JSON.parse(response.body).fetch('response').fetch('docs').map {|hit| Hash[meta[:id_field], hit.fetch(meta[:id_field])]}
