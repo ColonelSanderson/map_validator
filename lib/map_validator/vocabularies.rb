@@ -5,7 +5,8 @@ class MapValidator
         '[blank]',
         'Approximate'
       ],
-      formatPhysical: [
+      format: [
+        'Digital',
         'Linen',
         'Map',
         'Magnetic media',
@@ -21,34 +22,34 @@ class MapValidator
         'Plastic film',
         'Vellum or Parchment',
         'Volume'
-      ],
+        ],
       containedWith: [
-        '[blank]',
-        'Digital - Cartridge Tape (LTO)',
-        'Digital - Compact Disc (CD)',
-        'Digital - Digital Versatile Disc (DVD)',
-        'Digital - Floppy Disk',
-        'Digital - Hard Disk Drive',
-        'Digital - Network Attached Storage (NAS)',
-        'Digital - Universal Serial Bus (USB)',
-        'Physical - Album',
-        'Physical - Archives Box',
-        'Physical - Bundle',
-        'Physical - Card box',
-        'Physical - Card Drawer',
-        'Physical - Film canister',
-        'Physical - Microfilm box',
-        'Physical - Other',
-        'Physical - Phase Box',
-        'Physical - Slide carousel',
-        'Physical - Solander Box',
-        'Physical - Type 1 box',
-        'Physical - Type 10 box',
-        'Physical - Type 11 box',
-        'Physical - Type 2 box',
-        'Physical - Type 3.1 box',
-        'Physical - Type 5.1 box',
-        'Physical - Type 6 box'
+        'Aerial film canister',
+        'Album',
+        'Bundle',
+        'Card box',
+        'Card Drawer',
+        'Encapsulate',
+        'Film canister - non-vented',
+        'Film canister - vented',
+        'Folder',
+        'Map folder',
+        'Microfiche box',
+        'Microfilm box',
+        'No container',
+        'Other',
+        'Phase Box',
+        'Slide carousel',
+        'Solander Box',
+        'Type 1 box',
+        'Type 10 box',
+        'Type 11 box',
+        'Type 2 box',
+        'Type 3.1 box',
+        'Type 5.1 box',
+        'Type 6 box',
+        'Box - other',
+        'Wrapping'
       ],
       accessCategories: [
         '0',
@@ -82,6 +83,10 @@ class MapValidator
         'Secret and Sacred',
         'These records may contain terms or images which Aboriginal and Torres Strait Islander people may find distressing or offensive',
         'This record may contain information or photographs which some people may find distressing'
+      ],
+      representationType: [
+        'Digital',
+        'Physical'
       ]
     }
   end
