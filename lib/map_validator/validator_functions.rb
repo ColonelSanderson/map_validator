@@ -33,7 +33,7 @@ class MapValidator
         return
       end
       begin
-        parsedDate = Date.strptime(value.to_s, "%Y/%m/%d")
+        Date.strptime(value.to_s, "%d/%m/%Y")
       rescue ArgumentError, TypeError
         notifications.add_notification :ERROR,
                                        "Value `#{value}` was not a valid timestamp.",
@@ -115,7 +115,7 @@ class MapValidator
           return
         end
         docs = JSON.parse(response.body).fetch('response').fetch('docs').map {|hit| Hash[meta[:id_field], hit.fetch(meta[:id_field])]}
-        if docs.empty? || docs[0][meta[:id_field]] != value
+        if docs.empty? || docs[0][meta[:id_field]].to_s != value.to_s
           notifications.add_notification :ERROR, "No match found for field `#{meta[:id_field]}`: #{value}", formatSource(meta)
         end
       end

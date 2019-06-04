@@ -1,4 +1,3 @@
-# require 'test/unit'
 require 'rspec'
 require 'webmock/rspec'
 require_relative '../lib/map_validator/validator_functions'
